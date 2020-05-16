@@ -1,0 +1,121 @@
+html, body {
+  height: 100%;
+  width:  100%;
+  padding: 0;
+  margin:  0;
+  background-color: #fffff8;
+  color: #888;
+  font-family: 'Libre Baskerville', serif;
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-family: 'Montserrat', sans-serif;
+  color: #666;
+}
+
+.text {
+  width: 100%;
+  margin-top: 1.2rem;
+  margin-bottom: 1.2rem;
+  vertical-align: baseline;
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+}
+
+.header {
+  font-size: 1rem;
+  margin-top: 15px;
+  margin-bottom: 7px;
+  font-family: 'Montserrat', sans-serif;
+  color: #666;
+}
+
+.container {
+  width: 800px;
+  margin: 0 auto;
+  padding-top: 50px;
+}
+
+.game-container {
+  padding-top: 10px;
+}
+
+.hand {
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(7, 110px);
+  grid-column-gap: 5px;
+  grid-row-gap: 5px;
+  margin-bottom: 5px;
+}
+
+.card {
+  height: 150px;
+  cursor: pointer;
+  border-radius: 7px;
+  border: 1px solid #444;
+  z-index: 1;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.hidden {
+  display: none;
+}
+
+.discard {
+
+}
+
+.play-area {
+  position: relative;
+  height: 157px;
+}
+
+.board {
+  position: absolute;
+  left: 115px;
+  top: 0;
+}
+
+.line {
+  position: absolute;
+  left: 230px;
+  top: 0;
+  display: grid;
+  grid-template-columns: repeat(14, 35px);
+}
+
+.ineligible {
+  filter: brightness(70%);
+  cursor: zoom-in;
+}
+
+.eligible {
+  cursor: grab;
+}
+
+.zoom {
+  position: absolute;
+  top: 0px;
+  width: 800px;
+  padding: 400px 0 400px;
+  z-index: 10;
+  display: none;
+  cursor: zoom-out;
+}
+
+.zoomed {
+  display: block;
+  cursor: zoom-out;
+  height: 400px;
+  width: 300px;
+  margin: 0 auto;
+  border: 2px solid #444;
+  border-radius: 7px;
+}
