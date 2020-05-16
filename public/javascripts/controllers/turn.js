@@ -176,7 +176,9 @@ class Turn {
 
     if (isSurgeon && hasCardToBounce) {
       this.render()
-      this.notify("Return an opponent's card from the line to their hand")
+      this.notify(
+        `The ${this.activeText} player must return a ${this.nextColorText} card from the line to the ${this.nextColorText} player's hand`
+      )
     } else {
       this.advance()
     }
@@ -189,7 +191,9 @@ class Turn {
 
     if (lastCard.is(SURGEON) || lastCard.isCopying(SURGEON)) {
       this.render()
-      this.notify("Return an opponent's card from the line to their hand")
+      this.notify(
+        `The ${this.nextColorText} player must return a ${this.activeText} card from the line to the ${this.activeText} player's hand`
+      )
     } else {
       this.advance()
     }
@@ -209,6 +213,14 @@ class Turn {
 
   get imposterColor () {
     return this.deck.cards.find(card => card.number === IMPOSTER).color
+  }
+
+  get activeText () {
+    return this.active === LIGHT ? 'light' : 'dark'
+  }
+
+  get nextColorText () {
+    return this.active === LIGHT ? 'dark' : 'light'
   }
 
   dropCard () {
