@@ -28,8 +28,8 @@ const COLOR = {
 
 const path = (img, color) => `/public/images/${img}-${color}.png`
 
-const render = (card, isValid, isCopying) => {
-  const name = IMAGES[(isCopying && card.copiedNumber) || card.number]
+const render = (card, isValid, isCopying = false) => {
+  const name = IMAGES[isCopying && card.copiedNumber ? card.copiedNumber : card.number]
   const color = COLOR[card.color]
   const activeClass = isValid ? 'eligible' : 'ineligible'
 

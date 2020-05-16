@@ -30,7 +30,7 @@ class BaseCard {
       return this.canInitiateGame
     }
 
-    if (lastCard.is(IMPOSTER)) {
+    if (lastCard.is(IMPOSTER) && lastCard.copiedNumber) {
       const tail = line.cards.slice(0, line.cards.length - 1)
 
       tail.push(Card.of({
@@ -62,6 +62,10 @@ class BaseCard {
 
   isnt (cardNumbers = []) {
     return !this.in(cardNumbers)
+  }
+
+  isCopying (cardNumber) {
+    return this.copiedNumber === cardNumber
   }
 
   mustDiscard () {

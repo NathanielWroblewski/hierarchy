@@ -3,7 +3,11 @@ import { BARONESS, LEPER } from '../constants/numbers.js'
 
 class Queen extends BaseCard {
   _isValid (lastCard, line, hand) {
-    return line.includes(BARONESS) && lastCard.isnt([LEPER])
+    return (
+      line.includes(BARONESS) &&
+      lastCard.isnt([LEPER]) &&
+      this.number > lastCard.value
+    )
   }
 
   get isRoyalty () {

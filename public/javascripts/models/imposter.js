@@ -1,17 +1,12 @@
 import BaseCard from './base_card.js'
+import { TOWER, BARONESS, QUEEN, KING } from '../constants/numbers.js'
 
 class Imposter extends BaseCard {
   _isValid (lastCard, line, hand) {
-    const otherPlayerCardCount = line.cards.reduce((sum, card) => {
-      return card.color !== this.color ? sum + card.count : sum
-    }, 0)
-    const tail = line.cards.slice(0, line.cards.length - 1)
-    const opponentTail = tail.filter(card => card.color !== this.color)
+    const otherCards = line.cards.filter(card => card.color !== this.color)
+    const otherTail = otherCards.slice(0, otherCards.length - 1)
 
-    return (
-      otherPlayerCardCount > 1 &&
-      opponentTail.some(card => card.isValid(lastCard, line, hand))
-    )
+    return otherTail.some(card => card.isValid(line, hand))
   }
 
   get canInitiateGame () {
@@ -20,6 +15,14 @@ class Imposter extends BaseCard {
 
   copy (card) {
     this.copiedNumber = card.number
+  }
+
+  mustDiscard (lastCard) {
+    return this.isCopying(TOWER) && this.copiedNumber < lastCard.value
+  }
+
+  isRoyalty () {
+    return [TOWER, BARONESS, QUEEN, KING].includes(this.copiedNumber)
   }
 }
 
