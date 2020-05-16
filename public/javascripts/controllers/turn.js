@@ -1,4 +1,5 @@
 import FSM from '../models/fsm.js'
+import Line from '../models/line.js'
 import renderCard from '../views/card.js'
 import { CHANGE } from '../constants/events.js'
 import { DARK, LIGHT } from '../constants/colors.js'
@@ -56,8 +57,8 @@ class Turn {
       case DRAW_CONDITION: return this.drawCondition()
       case LOSS_CONDITION: return this.lossCondition()
       case PLAY_CARD: return this.playCard()
-      case DISCARD: return this.discard()
       case COPY: return this.copy()
+      case DISCARD: return this.discard()
       case BOUNCE_OPPONENT_CARD: return this.bounceOpponentCard()
       case BOUNCE_OWN_CARD: return this.bounceOwnCard()
     }
@@ -70,9 +71,9 @@ class Turn {
       case SET_ACTIVE_PLAYER: return this.phases.moveTo(DRAW_CONDITION)
       case DRAW_CONDITION: return this.phases.moveTo(LOSS_CONDITION)
       case LOSS_CONDITION: return this.phases.moveTo(PLAY_CARD)
-      case PLAY_CARD: return this.phases.moveTo(DISCARD)
-      case DISCARD: return this.phases.moveTo(COPY)
-      case COPY: return this.phases.moveTo(BOUNCE_OPPONENT_CARD)
+      case PLAY_CARD: return this.phases.moveTo(COPY)
+      case COPY: return this.phases.moveTo(DISCARD)
+      case DISCARD: return this.phases.moveTo(BOUNCE_OPPONENT_CARD)
       case BOUNCE_OPPONENT_CARD: return this.phases.moveTo(BOUNCE_OWN_CARD)
       case BOUNCE_OWN_CARD: return this.phases.moveTo(SET_ACTIVE_PLAYER)
     }
@@ -106,11 +107,13 @@ class Turn {
   }
 
   gameOver () {
+    this.render()
+
     setTimeout(() => {
       if (confirm(`${this.winMessage}! Play again?`)) {
         this.advance()
       }
-    }, 100)
+    }, 300)
   }
 
   drawCondition () {
@@ -134,28 +137,14 @@ class Turn {
   }
 
   notify (message) {
-    setTimeout(() => alert(message), 100)
+    setTimeout(() => alert(message), 300)
   }
 
-  // this.advance()
-  discard () {
-    // if computer
-    // else
-
-    if (this.line.last.mustDiscard(this.line.cards[this.line.cards.length - 2])) {
-      this.render()
-      this.notify('Drag a card to the discard pile')
-    } else {
-      this.advance()
-    }
-  }
-
-  // this.advance()
   copy () {
     // if computer
     // else
 
-    if (this.line.last.number === IMPOSTER) {
+    if (this.line.last.is(IMPOSTER)) {
       this.render()
       this.notify('Drag a card to the front of the line to impersonate it')
     } else {
@@ -163,12 +152,29 @@ class Turn {
     }
   }
 
-  // this.advance()
-  bounceOpponentCard () {
+  discard () {
+    const secondToLast = this.line.cards[this.line.cards.length - 2]
+
     // if computer
     // else
 
-    if (this.line.last.number === SURGEON) {
+    if (this.line.last.mustDiscard(secondToLast)) {
+      this.render()
+      this.notify('Drag a card to the discard pile')
+    } else {
+      this.advance()
+    }
+  }
+
+  bounceOpponentCard () {
+    const lastCard = this.line.last
+    const isSurgeon = lastCard.is(SURGEON) || lastCard.isCopying(SURGEON)
+    const otherCards = this.line.cards.filter(card => card.color !== lastCard.color && card.count === 1)
+    const hasCardToBounce = otherCards.length > 0
+    // if computer
+    // else
+
+    if (isSurgeon && hasCardToBounce) {
       this.render()
       this.notify("Return an opponent's card from the line to their hand")
     } else {
@@ -176,12 +182,12 @@ class Turn {
     }
   }
 
-  // this.advance()
   bounceOwnCard () {
+    const lastCard = this.line.last
     // if computer
     // else
 
-    if (this.line.last.number === SURGEON) {
+    if (lastCard.is(SURGEON) || lastCard.isCopying(SURGEON)) {
       this.render()
       this.notify("Return an opponent's card from the line to their hand")
     } else {
@@ -261,6 +267,7 @@ class Turn {
   render () {
     const ineligible = () => false
     const discard = [this.discarded].filter(card => card)
+    const isCopying = this.line.last && this.line.last.is(IMPOSTER) && this.line.last.copiedNumber
 
     switch (this.phase) {
       case GAME_OVER:
@@ -270,19 +277,19 @@ class Turn {
 
         this.renderCards(this.lightEl, this.light.cards, isValidDiscard)
         this.renderCards(this.darkEl, this.dark.cards, isValidDiscard)
-        this.renderCards(this.lineEl, this.line.cards, ineligible)
+        this.renderCards(this.lineEl, this.line.cards, ineligible, isCopying)
         this.renderCards(this.discardEl, discard, ineligible)
         break
       case BOUNCE_OPPONENT_CARD:
-        const isValidOppBounce = card => card.color !== this.active
+        const isValidOppBounce = card => card.color !== this.active && card.count === 1
 
         this.renderCards(this.lightEl, this.light.cards, ineligible)
         this.renderCards(this.darkEl, this.dark.cards, ineligible)
-        this.renderCards(this.lineEl, this.line.cards, isValidOppBounce)
+        this.renderCards(this.lineEl, this.line.cards, isValidOppBounce, isCopying)
         this.renderCards(this.discardEl, discard, ineligible)
         break
       case BOUNCE_OWN_CARD:
-        const isValidOwnBounce = card => card.color === this.active
+        const isValidOwnBounce = card => card.color === this.active && card.number !== SURGEON && card.count === 1
 
         this.renderCards(this.lightEl, this.light.cards, ineligible)
         this.renderCards(this.darkEl, this.dark.cards, ineligible)
@@ -290,8 +297,9 @@ class Turn {
         this.renderCards(this.discardEl, discard, ineligible)
         break
       case PLAY_CARD:
-        const isValidPlay = card => this.activeHand.includes(card.number) && card.isValid(this.line, this.activeHand)
-        const isCopying = this.line.last && this.line.last.number === IMPOSTER
+        const isValidPlay = card => (
+          this.activeHand.includes(card.number) && card.isValid(this.line, this.activeHand)
+        )
 
         this.renderCards(this.lightEl, this.light.cards, isValidPlay)
         this.renderCards(this.darkEl, this.dark.cards, isValidPlay)
@@ -299,11 +307,18 @@ class Turn {
         this.renderCards(this.discardEl, discard, ineligible)
         break
       case COPY:
-        const isValidCopy = card => this.line.includes(card.number) && card.color !== this.active && this.line.last.number !== card.number
+        const isValidCopy = card => {
+          const otherCards = this.line.cards.filter(card => card.color !== this.active)
+          const otherTail = otherCards.slice(0, otherCards.length - 1)
+          const tail = this.line.cards.slice(0, this.line.cards.length - 1)
+          const tailLine = new Line({ cards: tail })
+
+          return otherTail.includes(card) && card.isValid(tailLine, this.activeHand)
+        }
 
         this.renderCards(this.lightEl, this.light.cards, ineligible)
         this.renderCards(this.darkEl, this.dark.cards, ineligible)
-        this.renderCards(this.lineEl, this.line.cards, isValidCopy)
+        this.renderCards(this.lineEl, this.line.cards, isValidCopy, isCopying)
         this.renderCards(this.discardEl, discard, ineligible)
         break
     }
