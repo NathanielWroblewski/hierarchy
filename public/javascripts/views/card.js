@@ -26,7 +26,7 @@ const COLOR = {
   [DARK]: 'dark',
 }
 
-const path = (img, color) => `/public/images/${img}-${color}.png`
+const path = (img, color) => `/hierarchy/public/images/${img}-${color}.png`
 
 const render = (card, isValid, isCopying) => {
   const name = IMAGES[(isCopying && card.copiedNumber) || card.number]
