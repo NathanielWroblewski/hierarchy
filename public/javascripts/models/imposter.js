@@ -9,6 +9,10 @@ class Imposter extends BaseCard {
     return otherTail.some(card => card.isValid(line, hand))
   }
 
+  get value () {
+    return this.copiedNumber || this.number
+  }
+
   get canInitiateGame () {
     return false
   }

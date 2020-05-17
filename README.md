@@ -18,3 +18,4 @@ TODO
 - 2 player or vs computer
 - build a solver for AI
 - previous and next buttons when zoomed-in
+- assets on S3
