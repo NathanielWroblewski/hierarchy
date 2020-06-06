@@ -15,7 +15,12 @@ $ python3 -m http.server && open http://localhost:8000
 TODO
 ---
 
-- 2 player or vs computer
+- AI
 - build a solver for AI
 - previous and next buttons when zoomed-in
-- assets on S3
+- move assets to S3
+
+Copyright (c) 2019 Nathaniel Wroblewski
+I am making my contributions/submissions to this project solely in my personal
+capacity and am not conveying any rights to any intellectual property of any
+third parties.
