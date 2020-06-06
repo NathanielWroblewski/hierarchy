@@ -10,6 +10,13 @@ import {
   BOUNCE_OWN_CARD
 } from '../constants/turn_phases.js'
 
+/**
+ * Copyright (c) 2019 Nathaniel Wroblewski
+ * I am making my contributions/submissions to this project solely in my personal
+ * capacity and am not conveying any rights to any intellectual property of any
+ * third parties.
+ **/
+
 class Turn {
   constructor ({ deck, line, dark, light, lightEl, darkEl, lineEl, discardEl, zoomEl, playEl }) {
     this.deck = deck
@@ -65,6 +72,7 @@ class Turn {
   }
 
   advance () {
+    console.log(this.phase, this.activeHand, this.inactiveHand)
     switch (this.phase) {
       case NEW_GAME: return this.phases.moveTo(SET_ACTIVE_PLAYER)
       case GAME_OVER: return this.phases.moveTo(NEW_GAME)
@@ -99,7 +107,7 @@ class Turn {
   get winMessage () {
     if (this.light.empty && this.dark.empty) return 'DRAW'
 
-    if (this.activeHand.validPlays(this.line, this.deck).length === 0) {
+    if (this.activeHand.validPlays(this.line).length === 0) {
       return this.active === LIGHT ? 'DARK PLAYER WINS' : 'LIGHT PLAYER WINS'
     }
 
@@ -121,7 +129,7 @@ class Turn {
   }
 
   lossCondition () {
-    if (this.activeHand.validPlays(this.line, this.deck).length === 0) {
+    if (this.activeHand.validPlays(this.line).length === 0) {
       this.end()
     } else {
       this.advance()
@@ -311,7 +319,11 @@ class Turn {
       case PLAY_CARD:
         const isValidPlay = card => (
           this.activeHand.includes(card.number) && card.isValid(this.line, this.activeHand)
-        )
+        );
+        window.activeHand = this.activeHand
+        window.line = this.line
+        window.isValidPlay = isValidPlay
+        console.log('hand', this.activeHand.cards, 'line', this.line.cards)
 
         this.renderCards(this.lightEl, this.light.cards, isValidPlay)
         this.renderCards(this.darkEl, this.dark.cards, isValidPlay)
@@ -350,13 +362,4 @@ class Turn {
   }
 }
 
-
-
-// finite state machine
-// check for draw => (beware tower emptying hand, need to check both hands empty)
-// check for loss =>
-// play card => (on drag, hand.remove(card); line.add(card);) or computer
-// discard => (or computer) happens before resolving
-// bounce opponent card => (or computer) (happens after resolving)
-// bounce active player card => (or computer) (happens after resolving)
 export default Turn
