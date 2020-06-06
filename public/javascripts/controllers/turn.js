@@ -72,7 +72,6 @@ class Turn {
   }
 
   advance () {
-    console.log(this.phase, this.activeHand, this.inactiveHand)
     switch (this.phase) {
       case NEW_GAME: return this.phases.moveTo(SET_ACTIVE_PLAYER)
       case GAME_OVER: return this.phases.moveTo(NEW_GAME)
@@ -320,10 +319,6 @@ class Turn {
         const isValidPlay = card => (
           this.activeHand.includes(card.number) && card.isValid(this.line, this.activeHand)
         );
-        window.activeHand = this.activeHand
-        window.line = this.line
-        window.isValidPlay = isValidPlay
-        console.log('hand', this.activeHand.cards, 'line', this.line.cards)
 
         this.renderCards(this.lightEl, this.light.cards, isValidPlay)
         this.renderCards(this.darkEl, this.dark.cards, isValidPlay)
