@@ -3,6 +3,8 @@ Hierarchy
 
 An abstract, strategic card game for two players
 
+![Screenshot](https://raw.githubusercontent.com/NathanielWroblewski/hierarchy/master/public/images/screenshot.png)
+
 To run locally (Mac)
 ---
 
@@ -19,6 +21,7 @@ TODO
 - build a solver for AI
 - previous and next buttons when zoomed-in
 - move assets to S3
+- mobile support for drag and drop/touch
 
 Copyright (c) 2019 Nathaniel Wroblewski
 I am making my contributions/submissions to this project solely in my personal
